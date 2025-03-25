@@ -28,6 +28,22 @@ interface AgentState {
 // Local storage key for saving agent state
 const STORAGE_KEY = "mcp-agent-state";
 
+const ExternalLink = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    className="w-3 h-3 ml-1"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+    />
+  </svg>
+);
 
 export function MCPConfigForm() {
   // Use our localStorage hook for persistent storage
@@ -320,9 +336,18 @@ export function MCPConfigForm() {
           </div>
         )}
 
-        {/* Composio & mcp.run reference */}
         <div className="mt-10 pt-4 border-t text-center text-sm text-gray-500">
-          MCP – Your Gateway to Smart Solutions.
+          MCP – Your Gateway to Smart Solutions. and More MCP servers available
+          on the web, e.g.{" "}
+          <a
+            href="https://mcp.composio.dev/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gray-700 hover:text-gray-900 inline-flex items-center mr-2"
+          >
+            mcp.composio.dev
+            <ExternalLink />
+          </a>
         </div>
       </div>
 
