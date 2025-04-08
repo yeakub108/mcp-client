@@ -1,12 +1,10 @@
 export const schedulerTool = {
   name: "auto_schedule_feature",
   description:
-    "Estimate how many days the feature will take based on current workload.",
+    "Estimate how many days the feature will take based on complexity and workload.",
   func: async (feature: string) => {
-    // Fake logic — integrate with real project calendar later
-    if (feature.toLowerCase().includes("about")) {
-      return `This feature can be done in 2 days.`;
-    }
-    return `Based on complexity, estimated time is 5 working days.`;
+    // This now returns open-ended responses that let the AI model determine the days
+    // based on its assessment of the feature complexity
+    return `Based on analysis of the feature "${feature}", please determine appropriate timeline in work days.`;
   },
 };

@@ -8,7 +8,12 @@ export async function POST(req: NextRequest) {
 
     const result = await runBAAgent({ feature, repo });
 
-    return NextResponse.json({ success: true, result });
+    // Return the raw text result without additional JSON wrapping
+    return new NextResponse(result, {
+      headers: {
+        "Content-Type": "text/html; charset=utf-8",
+      },
+    });
   } catch (error: any) {
     return NextResponse.json(
       { success: false, error: error.message || "Something went wrong" },
