@@ -1,0 +1,8 @@
+{
+  "buildCommand": "pnpm build",
+  "outputDirectory": ".next",
+  "framework": "nextjs",
+  "env": {
+    "LANGSMITH_API_KEY": "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"
+  }
+}
