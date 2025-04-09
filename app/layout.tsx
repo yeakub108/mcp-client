@@ -36,7 +36,11 @@ export default function RootLayout({
             agent="sample_agent"
             showDevConsole={false}
           >
-            {children}
+            <div className="flex min-h-screen flex-col">
+              <main className="flex-grow">
+                {children}
+              </main>
+            </div>
           </CopilotKit>
         </AuthProvider>
       </body>

@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabase, signIn, signUp, signOut, getSession } from '../../lib/supabase/supabase-client';
+import { supabase } from '../../lib/supabase/supabase-browser';
 
 type User = {
   id: string;
@@ -15,6 +15,7 @@ type AuthContextType = {
   signIn: (email: string, password: string) => Promise<any>;
   signUp: (email: string, password: string) => Promise<any>;
   signOut: () => Promise<any>;
+  refreshSession: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -24,24 +25,86 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
+  // Function to refresh the session
+  const refreshSession = async () => {
+    try {
+      const { data, error } = await supabase.auth.getSession();
+      if (error) throw error;
+      
+      if (data.session?.user) {
+        setUser({
+          id: data.session.user.id,
+          email: data.session.user.email,
+        });
+      } else {
+        setUser(null);
+      }
+    } catch (error) {
+      console.error('Error refreshing session:', error);
+      setUser(null);
+    }
+  };
+
+  // Sign in function
+  const handleSignIn = async (email: string, password: string) => {
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      
+      if (error) throw error;
+      
+      return { data, error: null };
+    } catch (error: any) {
+      console.error('Login error:', error);
+      return { 
+        data: null, 
+        error: { message: error.message || 'Authentication failed' }
+      };
+    }
+  };
+
+  // Sign up function
+  const handleSignUp = async (email: string, password: string) => {
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+      
+      if (error) throw error;
+      
+      return { data, error: null };
+    } catch (error: any) {
+      console.error('Registration error:', error);
+      return { 
+        data: null, 
+        error: { message: error.message || 'Registration failed' }
+      };
+    }
+  };
+
+  // Sign out function
+  const handleSignOut = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      
+      router.push('/auth/login');
+      return { error: null };
+    } catch (error: any) {
+      console.error('Sign out error:', error);
+      return { error };
+    }
+  };
+
   useEffect(() => {
     // Check for active session on initial load
     const initAuth = async () => {
       setLoading(true);
-      
-      try {
-        const { data } = await getSession();
-        if (data.session?.user) {
-          setUser({
-            id: data.session.user.id,
-            email: data.session.user.email,
-          });
-        }
-      } catch (error) {
-        console.error('Error initializing auth:', error);
-      } finally {
-        setLoading(false);
-      }
+      await refreshSession();
+      setLoading(false);
     };
 
     initAuth();
@@ -69,9 +132,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       value={{
         user,
         loading,
-        signIn,
-        signUp,
-        signOut,
+        signIn: handleSignIn,
+        signUp: handleSignUp,
+        signOut: handleSignOut,
+        refreshSession
       }}
     >
       {children}

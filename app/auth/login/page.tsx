@@ -3,15 +3,27 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { signIn } from "../../../lib/supabase/supabase-client";
-import SupabaseStatus from "../../components/supabase-status";
+import { supabase } from "../../../lib/supabase/supabase-browser";
+import { useAuth } from "../../hooks/useAuth";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const { refreshSession } = useAuth();
   const router = useRouter();
+
+  // If user is already logged in, redirect to home page
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (data.session) {
+        router.push('/');
+      }
+    };
+    checkSession();
+  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,7 +31,11 @@ export default function LoginPage() {
     setError(null);
 
     try {
-      const { data, error } = await signIn(email, password);
+      // Use the Supabase client directly to ensure cookies are set properly
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
       if (error) {
         setError(error.message);
@@ -27,8 +43,21 @@ export default function LoginPage() {
       }
 
       if (data.session) {
-        // Redirect to the home page after successful login
-        router.push("/");
+        // Explicitly refresh the session to ensure cookies are set
+        await refreshSession();
+        
+        // Show a success message briefly
+        setError(null);
+        const successMessage = document.createElement('div');
+        successMessage.className = 'text-green-500 text-sm mt-2';
+        successMessage.textContent = 'Login successful! Redirecting to home page...';
+        document.querySelector('form')?.appendChild(successMessage);
+        
+        // Add a small delay to ensure cookies are properly set before redirect
+        setTimeout(() => {
+          // Redirect to the home page after successful login
+          router.push("/");
+        }, 1000);
       }
     } catch (err) {
       setError("An unexpected error occurred. Please try again.");
@@ -102,7 +131,7 @@ export default function LoginPage() {
         </div>
       </form>
 
-      <div className="mt-6">
+      {/* <div className="mt-6">
         <div className="text-center text-sm">
           <p>
             Don&apos;t have an account?{" "}
@@ -114,7 +143,7 @@ export default function LoginPage() {
             </Link>
           </p>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }

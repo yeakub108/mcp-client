@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { signUp } from '../../../lib/supabase/supabase-client';
-import SupabaseStatus from '../../components/supabase-status';
+import { supabase } from '../../../lib/supabase/supabase-browser';
+import { useAuth } from '../../hooks/useAuth';
 
 export default function RegisterPage() {
   const [email, setEmail] = useState('');
@@ -13,7 +13,19 @@ export default function RegisterPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const { refreshSession } = useAuth();
   const router = useRouter();
+
+  // If user is already logged in, redirect to home page
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (data.session) {
+        router.push('/');
+      }
+    };
+    checkSession();
+  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,19 +41,35 @@ export default function RegisterPage() {
     }
 
     try {
-      const { data, error } = await signUp(email, password);
+      // Use the Supabase client directly to ensure cookies are set properly
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+      });
       
       if (error) {
         setError(error.message);
         return;
       }
 
-      setSuccessMessage('Registration successful! Please check your email for confirmation.');
-      
-      // Redirect to login page after a delay
-      setTimeout(() => {
-        router.push('/auth/login');
-      }, 3000);
+      // For auto-confirm setups, the user will be immediately logged in
+      if (data.session) {
+        await refreshSession();
+        setSuccessMessage('Registration successful! Redirecting to home page...');
+        
+        // Redirect to home page after a delay
+        setTimeout(() => {
+          router.push('/');
+        }, 1500);
+      } else {
+        // For email confirmation flow
+        setSuccessMessage('Registration successful! Please check your email for confirmation.');
+        
+        // Redirect to login page after a delay
+        setTimeout(() => {
+          router.push('/auth/login');
+        }, 3000);
+      }
       
     } catch (err) {
       setError('An unexpected error occurred. Please try again.');

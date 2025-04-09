@@ -2,6 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 // CSS styles to make the output match the login_page_Business_Analysis.txt format
 const businessAnalysisStyles = `
@@ -190,6 +191,7 @@ function processMarkdownContent(content: string): string {
 }
 
 export default function DemoPage() {
+  const router = useRouter();
   const [feature, setFeature] = useState("");
   const [repo, setRepo] = useState("");
   const [result, setResult] = useState("");
@@ -222,9 +224,14 @@ export default function DemoPage() {
     }
   };
 
+
   return (
     <div style={{ padding: 32 }}>
-      <h1>Run BA Agent</h1>
+      <button 
+        className="text-3xl font-bold cursor-pointer mb-8" 
+        onClick={() => router.push('/')}
+      >❮❮</button>
+      <p className="font-medium text-2xl text-center">Business Analyst (BA)</p>
       <input
         style={{
           padding: 8,
