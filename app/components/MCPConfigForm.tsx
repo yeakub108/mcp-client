@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useCoAgent } from "@copilotkit/react-core";
 import { ExampleConfigs } from "./ExampleConfigs";
 import { useLocalStorage } from "../hooks/useLocalStorage";
+import { useRouter } from "next/navigation";
 
 type ConnectionType = "stdio" | "sse";
 
@@ -46,6 +47,9 @@ const ExternalLink = () => (
 );
 
 export function MCPConfigForm() {
+  // Use Next.js router for navigation
+  const router = useRouter();
+  
   // Use our localStorage hook for persistent storage
   const [savedConfigs, setSavedConfigs] = useLocalStorage<
     Record<string, ServerConfig>
@@ -349,6 +353,52 @@ export function MCPConfigForm() {
             <ExternalLink />
           </a>
         </div>
+      </div>
+
+      {/* Multi-Agent */}
+      <div className="bg-white border rounded-md p-6">
+        <h2 className="text-lg font-semibold mb-4">Multi Agent</h2>
+
+        {totalServers === 0 ? (
+          <div className="text-gray-500 text-center py-10">
+            No servers configured. Click &quot;Add Server&quot; to get started.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div
+              className="border rounded-md overflow-hidden bg-white shadow-sm hover:shadow-md transition-all"
+              onClick={() => router.push("/business-analyst")}
+              style={{ cursor: "pointer" }}
+            >
+              <div className="p-4">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="font-semibold">Business Analyst (BA)</h3>
+                    <p className="text-sm text-gray-500 mt-1">
+                      Analyze feature requests and generate scope estimates
+                    </p>
+                  </div>
+                  <div className="text-blue-500">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 5l7 7-7 7"
+                      />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Add Server Modal */}
