@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useState, useEffect } from "react";
@@ -77,17 +78,20 @@ function parseMarkdown(text: string): string {
   if (!text) return "";
 
   let processed = text;
-  
+
   // First, we need to handle the case where text is already inside <p> tags
   // We'll extract and process each paragraph separately
-  const hasPTags = processed.includes('<p>');
-  
+  const hasPTags = processed.includes("<p>");
+
   if (hasPTags) {
     // Extract content between <p> and </p> tags to avoid processing HTML
     const pTagRegex = /<p>([\s\S]*?)<\/p>/g;
-    processed = processed.replace(pTagRegex, (match: string, content: string) => {
-      return `<p>${processMarkdownContent(content)}</p>`;
-    });
+    processed = processed.replace(
+      pTagRegex,
+      (match: string, content: string) => {
+        return `<p>${processMarkdownContent(content)}</p>`;
+      }
+    );
   } else {
     // If there are no <p> tags, process the entire text
     processed = processMarkdownContent(processed);
@@ -101,74 +105,78 @@ function processMarkdownContent(content: string): string {
   let processedContent = content;
 
   // Handle headings - capture heading level (number of #) and the heading text
-  processedContent = processedContent.replace(/^(#{1,6})\s+(.+)$/gm, (match, hashes, text) => {
-    const level = hashes.length;
-    return `<h${level} style="font-weight: bold; margin-top: 1em; margin-bottom: 0.5em;">${text}</h${level}>`;
-  });
+  processedContent = processedContent.replace(
+    /^(#{1,6})\s+(.+)$/gm,
+    (match, hashes, text) => {
+      const level = hashes.length;
+      return `<h${level} style="font-weight: bold; margin-top: 1em; margin-bottom: 0.5em;">${text}</h${level}>`;
+    }
+  );
 
   // Convert **text** to <strong>text</strong> (bold)
-  processedContent = processedContent.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  processedContent = processedContent.replace(
+    /\*\*([^*]+)\*\*/g,
+    "<strong>$1</strong>"
+  );
 
   // Convert *text* to <em>text</em> (italic)
-  processedContent = processedContent.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+  processedContent = processedContent.replace(/\*([^*]+)\*/g, "<em>$1</em>");
 
   // Create an array of lines to properly handle lists
-  const lines = processedContent.split('\n');
+  const lines = processedContent.split("\n");
   let inList = false;
-  let listType = '';
-  let listContent = [];
-  let result = [];
+  let listType = "";
+  // Removed unused listContent array
+  const result = [];
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
-    
+
     // Check if line is a list item
     const bulletMatch = line.match(/^\s*-\s+(.+)$/);
     const numberedMatch = line.match(/^\s*(\d+)\.\s+(.+)$/);
-    
+
     if (bulletMatch) {
       // Bullet list item
-      if (!inList || listType !== 'ul') {
+      if (!inList || listType !== "ul") {
         // Start a new list if we're not in one or switching types
         if (inList) {
           // Close previous list
           result.push(`</${listType}>`);
         }
         inList = true;
-        listType = 'ul';
+        listType = "ul";
         result.push('<ul style="margin-left: 1.5em; list-style-type: disc;">');
       }
       result.push(`<li>${bulletMatch[1]}</li>`);
-    } 
-    else if (numberedMatch) {
+    } else if (numberedMatch) {
       // Numbered list item
-      if (!inList || listType !== 'ol') {
+      if (!inList || listType !== "ol") {
         // Start a new list if we're not in one or switching types
         if (inList) {
           // Close previous list
           result.push(`</${listType}>`);
         }
         inList = true;
-        listType = 'ol';
+        listType = "ol";
         result.push('<ol style="margin-left: 1.5em;">');
       }
       result.push(`<li>${numberedMatch[2]}</li>`);
-    } 
-    else {
+    } else {
       // Not a list item
       if (inList) {
         // Close the list if we were in one
         result.push(`</${listType}>`);
         inList = false;
       }
-      
+
       // If line is not empty, wrap in paragraph tags if it's not already a heading
       if (line.trim() && !line.match(/^<h[1-6]/)) {
         result.push(`<div style="margin-bottom: 0.75em;">${line}</div>`);
       } else if (line.trim()) {
         result.push(line); // Just push headings as-is
       } else {
-        result.push('<br>'); // Empty lines become breaks
+        result.push("<br>"); // Empty lines become breaks
       }
     }
   }
@@ -178,7 +186,7 @@ function processMarkdownContent(content: string): string {
     result.push(`</${listType}>`);
   }
 
-  return result.join('\n');
+  return result.join("\n");
 }
 
 export default function DemoPage() {
@@ -228,7 +236,7 @@ export default function DemoPage() {
         onChange={(e) => setFeature(e.target.value)}
         placeholder="Feature"
       />
-      <input
+      {/* <input
         style={{
           padding: 8,
           marginRight: 10,
@@ -238,7 +246,7 @@ export default function DemoPage() {
         value={repo}
         onChange={(e) => setRepo(e.target.value)}
         placeholder="Repo"
-      />
+      /> */}
       <button
         onClick={runAgent}
         disabled={loading}

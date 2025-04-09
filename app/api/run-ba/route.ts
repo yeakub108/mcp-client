@@ -5,7 +5,7 @@ export async function POST(req: NextRequest) {
   try {
     // Check if OpenAI API key is available (don't log the full key for security)
     const hasApiKey = !!process.env.OPENAI_API_KEY;
-    const apiKeyPrefix = process.env.OPENAI_API_KEY ? process.env.OPENAI_API_KEY.substring(0, 5) + '...' : 'not set';
+    // Removed unused apiKeyPrefix variable
     
     const body = await req.json();
     const { feature, repo } = body;
