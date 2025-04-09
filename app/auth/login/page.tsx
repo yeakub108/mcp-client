@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -19,7 +21,7 @@ export default function LoginPage() {
     const checkSession = async () => {
       const { data } = await supabase.auth.getSession();
       if (data.session) {
-        router.push('/');
+        router.push("/");
       }
     };
     checkSession();
@@ -45,14 +47,15 @@ export default function LoginPage() {
       if (data.session) {
         // Explicitly refresh the session to ensure cookies are set
         await refreshSession();
-        
+
         // Show a success message briefly
         setError(null);
-        const successMessage = document.createElement('div');
-        successMessage.className = 'text-green-500 text-sm mt-2';
-        successMessage.textContent = 'Login successful! Redirecting to home page...';
-        document.querySelector('form')?.appendChild(successMessage);
-        
+        const successMessage = document.createElement("div");
+        successMessage.className = "text-green-500 text-sm mt-2";
+        successMessage.textContent =
+          "Login successful! Redirecting to home page...";
+        document.querySelector("form")?.appendChild(successMessage);
+
         // Add a small delay to ensure cookies are properly set before redirect
         setTimeout(() => {
           // Redirect to the home page after successful login

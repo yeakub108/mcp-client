@@ -1,8 +1,15 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { useRouter } from 'next/navigation';
-import { supabase } from '../../lib/supabase/supabase-browser';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+} from "react";
+import { useRouter } from "next/navigation";
+import { supabase } from "../../lib/supabase/supabase-browser";
 
 type User = {
   id: string;
@@ -30,7 +37,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const { data, error } = await supabase.auth.getSession();
       if (error) throw error;
-      
+
       if (data.session?.user) {
         setUser({
           id: data.session.user.id,
@@ -40,7 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(null);
       }
     } catch (error) {
-      console.error('Error refreshing session:', error);
+      console.error("Error refreshing session:", error);
       setUser(null);
     }
   };
@@ -52,15 +59,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         email,
         password,
       });
-      
+
       if (error) throw error;
-      
+
       return { data, error: null };
     } catch (error: any) {
-      console.error('Login error:', error);
-      return { 
-        data: null, 
-        error: { message: error.message || 'Authentication failed' }
+      console.error("Login error:", error);
+      return {
+        data: null,
+        error: { message: error.message || "Authentication failed" },
       };
     }
   };
@@ -72,15 +79,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         email,
         password,
       });
-      
+
       if (error) throw error;
-      
+
       return { data, error: null };
     } catch (error: any) {
-      console.error('Registration error:', error);
-      return { 
-        data: null, 
-        error: { message: error.message || 'Registration failed' }
+      console.error("Registration error:", error);
+      return {
+        data: null,
+        error: { message: error.message || "Registration failed" },
       };
     }
   };
@@ -90,11 +97,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
-      
-      router.push('/auth/login');
+
+      router.push("/auth/login");
       return { error: null };
     } catch (error: any) {
-      console.error('Sign out error:', error);
+      console.error("Sign out error:", error);
       return { error };
     }
   };
@@ -110,17 +117,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     initAuth();
 
     // Listen for auth state changes
-    const { data } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session?.user) {
-        setUser({
-          id: session.user.id,
-          email: session.user.email,
-        });
-      } else {
-        setUser(null);
+    const { data } = supabase.auth.onAuthStateChange(
+      (
+        event:
+          | "SIGNED_IN"
+          | "SIGNED_OUT"
+          | "TOKEN_REFRESHED"
+          | "USER_UPDATED"
+          | "PASSWORD_RECOVERY",
+        session: any
+      ) => {
+        if (session?.user) {
+          setUser({
+            id: session.user.id,
+            email: session.user.email,
+          });
+        } else {
+          setUser(null);
+        }
+        setLoading(false);
       }
-      setLoading(false);
-    });
+    );
 
     return () => {
       data.subscription.unsubscribe();
@@ -135,7 +152,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         signIn: handleSignIn,
         signUp: handleSignUp,
         signOut: handleSignOut,
-        refreshSession
+        refreshSession,
       }}
     >
       {children}
@@ -146,7 +163,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 }

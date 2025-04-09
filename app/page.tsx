@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { CopilotChat } from "@copilotkit/react-ui";
@@ -13,26 +14,26 @@ export default function Home() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { user, loading, signOut } = useAuth();
   const [mounted, setMounted] = useState(false);
-  
+
   // Prevent hydration issues
   useEffect(() => {
     setMounted(true);
   }, []);
-  
+
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (isDropdownOpen) {
         const target = event.target as Element;
-        if (!target.closest('.user-dropdown')) {
+        if (!target.closest(".user-dropdown")) {
           setIsDropdownOpen(false);
         }
       }
     };
-    
-    document.addEventListener('mousedown', handleClickOutside);
+
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isDropdownOpen]);
 
@@ -48,38 +49,49 @@ export default function Home() {
           <div className="mb-8 flex flex-col">
             <div className="flex justify-between items-center">
               <h1 className="text-3xl font-bold"></h1>
-              
+
               <div className="flex items-center gap-4">
                 {user ? (
                   <div className="relative user-dropdown">
-                    <button 
-                      className="flex items-center gap-2 outline-none focus:outline-none" 
+                    <button
+                      className="flex items-center gap-2 outline-none focus:outline-none"
                       onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                     >
                       <div className="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center text-white">
-                        {user.email?.charAt(0).toUpperCase() || '?'}
+                        {user.email?.charAt(0).toUpperCase() || "?"}
                       </div>
                       <span className="text-sm font-medium text-gray-700">
-                        {user.email?.split('@')[0] || 'User'}
+                        {user.email?.split("@")[0] || "User"}
                       </span>
                       {/* Dropdown arrow */}
-                      <svg 
-                        className={`h-4 w-4 text-gray-500 transition-transform duration-200 ${isDropdownOpen ? 'transform rotate-180' : ''}`} 
-                        fill="none" 
-                        stroke="currentColor" 
-                        viewBox="0 0 24 24" 
+                      <svg
+                        className={`h-4 w-4 text-gray-500 transition-transform duration-200 ${
+                          isDropdownOpen ? "transform rotate-180" : ""
+                        }`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
                         xmlns="http://www.w3.org/2000/svg"
                       >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M19 9l-7 7-7-7"
+                        ></path>
                       </svg>
                     </button>
-                    
+
                     {/* Dropdown menu */}
                     {isDropdownOpen && (
                       <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200 animate-fadeIn">
                         <div className="px-4 py-2 border-b">
-                          <p className="text-xs text-gray-500 font-medium">Signed in as</p>
-                          <p className="text-sm text-gray-700 truncate">{user.email}</p>
+                          <p className="text-xs text-gray-500 font-medium">
+                            Signed in as
+                          </p>
+                          <p className="text-sm text-gray-700 truncate">
+                            {user.email}
+                          </p>
                         </div>
                         <button
                           onClick={() => {
@@ -100,7 +112,7 @@ export default function Home() {
                 )}
               </div>
             </div>
-            
+
             {/* {user && (
               <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-100">
                 <h2 className="text-xl font-semibold text-blue-800 mb-2">Welcome back, {user.email?.split('@')[0] || 'User'}!</h2>
@@ -109,7 +121,7 @@ export default function Home() {
             )} */}
           </div>
         )}
-        
+
         <MCPConfigForm />
       </div>
 
