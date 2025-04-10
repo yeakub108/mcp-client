@@ -56,10 +56,11 @@ export default function LoginPage() {
           "Login successful! Redirecting to home page...";
         document.querySelector("form")?.appendChild(successMessage);
 
-        // Add a small delay to ensure cookies are properly set before redirect
+        // Force a hard navigation instead of client-side routing
+        // This ensures proper cookie handling across environments
         setTimeout(() => {
-          // Redirect to the home page after successful login
-          router.push("/");
+          // Use window.location for a full page refresh and navigation
+          window.location.href = "/";
         }, 1000);
       }
     } catch (err) {

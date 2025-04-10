@@ -22,6 +22,15 @@ export function createSupabaseBrowserClient() {
         storageKey: 'supabase-auth',
         detectSessionInUrl: true,
         autoRefreshToken: true,
+        flowType: 'pkce' // More secure flow type for production environments
+      },
+      // Use cookieOptions directly on the client options
+      cookieOptions: {
+        name: 'sb-auth-token',
+        maxAge: 60 * 60 * 24 * 7, // 1 week
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        path: '/'
       }
     }
   );
